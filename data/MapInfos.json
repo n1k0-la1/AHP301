@@ -1,4 +1,9 @@
 [
 null,
-{"id":1,"expanded":false,"name":"MAP001","order":1,"parentId":0,"scrollX":411.5,"scrollY":334}
+{"id":1,"expanded":true,"name":"office_cubicle","order":1,"parentId":0,"scrollX":808,"scrollY":532.5},
+{"id":2,"expanded":false,"name":"office_boss","order":2,"parentId":0,"scrollX":808,"scrollY":532.5},
+{"id":3,"expanded":false,"name":"road","order":3,"parentId":0,"scrollX":808,"scrollY":532.5},
+{"id":4,"expanded":false,"name":"room_living","order":4,"parentId":0,"scrollX":808,"scrollY":532.5},
+{"id":5,"expanded":false,"name":"room_bed","order":5,"parentId":0,"scrollX":808,"scrollY":532.5},
+{"id":6,"expanded":false,"name":"room_hallway","order":6,"parentId":0,"scrollX":808,"scrollY":532.5}
 ]
