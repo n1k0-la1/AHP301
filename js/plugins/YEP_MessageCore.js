@@ -4,14 +4,8 @@
 //=============================================================================
 
 var Imported = Imported || {};
-Imported.YEP_MessageCore = true;
-
-var Yanfly = Yanfly || {};
-Yanfly.Message = Yanfly.Message || {};
-Yanfly.Message.version = 1.19;
-
-//=============================================================================
- /*:
+4
+/*:
  * @plugindesc v1.19 Adds more features to the Message Window to customized
  * the way your messages appear and functions.
  * @author Yanfly Engine Plugins
@@ -549,11 +543,11 @@ Game_System.prototype.initMessageSystem = function() {
 
 Game_System.prototype.initMessageFontSettings = function() {
     if ($dataSystem.locale.match(/^zh/)) {
-      this._msgFontName = Yanfly.Param.MSGCNFontName;
+        this._msgFontName = Yanfly.Param.MSGCNFontName;
     } else if ($dataSystem.locale.match(/^ko/)) {
-      this._msgFontName = Yanfly.Param.MSGKRFontName;
+        this._msgFontName = Yanfly.Param.MSGKRFontName;
     } else {
-      this._msgFontName = Yanfly.Param.MSGFontName;
+        this._msgFontName = Yanfly.Param.MSGFontName;
     }
     this._msgFontSize = Yanfly.Param.MSGFontSize;
     this._msgFontOutline = Yanfly.Param.MSGFontOutline;
@@ -645,41 +639,41 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 
 Game_Interpreter.prototype.command101 = function() {
     if (!$gameMessage.isBusy()) {
-      $gameMessage.setFaceImage(this._params[0], this._params[1]);
-      $gameMessage.setBackground(this._params[2]);
-      $gameMessage.setPositionType(this._params[3]);
-      while (this.isContinueMessageString()) {
-        this._index++;
-        if (this._list[this._index].code === 401) {
-          $gameMessage.addText(this.currentCommand().parameters[0]);
+        $gameMessage.setFaceImage(this._params[0], this._params[1]);
+        $gameMessage.setBackground(this._params[2]);
+        $gameMessage.setPositionType(this._params[3]);
+        while (this.isContinueMessageString()) {
+            this._index++;
+            if (this._list[this._index].code === 401) {
+                $gameMessage.addText(this.currentCommand().parameters[0]);
+            }
+            if ($gameMessage._texts.length >= $gameSystem.messageRows()) break;
         }
-        if ($gameMessage._texts.length >= $gameSystem.messageRows()) break;
-      }
-      switch (this.nextEventCode()) {
-      case 102:
+        switch (this.nextEventCode()) {
+            case 102:
+                this._index++;
+                this.setupChoices(this.currentCommand().parameters);
+                break;
+            case 103:
+                this._index++;
+                this.setupNumInput(this.currentCommand().parameters);
+                break;
+            case 104:
+                this._index++;
+                this.setupItemChoice(this.currentCommand().parameters);
+                break;
+        }
         this._index++;
-        this.setupChoices(this.currentCommand().parameters);
-        break;
-      case 103:
-        this._index++;
-        this.setupNumInput(this.currentCommand().parameters);
-        break;
-      case 104:
-        this._index++;
-        this.setupItemChoice(this.currentCommand().parameters);
-        break;
-      }
-      this._index++;
-      this.setWaitMode('message');
+        this.setWaitMode('message');
     }
     return false;
 };
 
 Game_Interpreter.prototype.isContinueMessageString = function() {
     if (this.nextEventCode() === 101 && $gameSystem.messageRows() > 4) {
-      return true;
+        return true;
     } else {
-      return this.nextEventCode() === 401;
+        return this.nextEventCode() === 401;
     }
 };
 
@@ -713,17 +707,17 @@ Window_Base.prototype.convertEscapeCharacters = function(text) {
 Window_Base.prototype.setWordWrap = function(text) {
     this._wordWrap = false;
     if (text.match(/<(?:WordWrap)>/i)) {
-      this._wordWrap = true;
-      text = text.replace(/<(?:WordWrap)>/gi, '');
+        this._wordWrap = true;
+        text = text.replace(/<(?:WordWrap)>/gi, '');
     }
     if (this._wordWrap) {
-      var replace = Yanfly.Param.MSGWrapSpace ? ' ' : '';
-      text = text.replace(/[\n\r]+/g, replace);
+        var replace = Yanfly.Param.MSGWrapSpace ? ' ' : '';
+        text = text.replace(/[\n\r]+/g, replace);
     }
     if (this._wordWrap) {
-      text = text.replace(/<(?:BR|line break)>/gi, '\n');
+        text = text.replace(/<(?:BR|line break)>/gi, '\n');
     } else {
-      text = text.replace(/<(?:BR|line break)>/gi, '');
+        text = text.replace(/<(?:BR|line break)>/gi, '');
     }
     return text;
 };
@@ -838,44 +832,44 @@ Window_Base.prototype.obtainEscapeString = function(textState) {
 Yanfly.Message.Window_Base_processEscapeCharacter =
     Window_Base.prototype.processEscapeCharacter;
 Window_Base.prototype.processEscapeCharacter = function(code, textState) {
-  switch (code) {
-  case 'MSGCORE':
-    var id = this.obtainEscapeParam(textState);
-    if (id === 0) {
-      $gameSystem.initMessageFontSettings();
-      this.resetFontSettings();
+    switch (code) {
+        case 'MSGCORE':
+            var id = this.obtainEscapeParam(textState);
+            if (id === 0) {
+                $gameSystem.initMessageFontSettings();
+                this.resetFontSettings();
+            }
+            if (id === 1) this.contents.fontBold = !this.contents.fontBold;
+            if (id === 2) this.contents.fontItalic = !this.contents.fontItalic;
+            break;
+        case 'FS':
+            var size = this.obtainEscapeParam(textState);
+            this.contents.fontSize = size;
+            if (Yanfly.Param.MSGFontMaintain) $gameSystem.setMessageFontSize(size);
+            break;
+        case 'FN':
+            var name = this.obtainEscapeString(textState);
+            this.contents.fontFace = name;
+            if (Yanfly.Param.MSGFontMaintain) $gameSystem.setMessageFontName(name);
+            break;
+        case 'OC':
+            var id = this.obtainEscapeParam(textState);
+            this.contents.outlineColor = this.textColor(id);
+            break;
+        case 'OW':
+            this.contents.outlineWidth = this.obtainEscapeParam(textState);
+            break;
+        case 'PX':
+            textState.x = this.obtainEscapeParam(textState);
+            break;
+        case 'PY':
+            textState.y = this.obtainEscapeParam(textState);
+            break;
+        default:
+            Yanfly.Message.Window_Base_processEscapeCharacter.call(this,
+                code, textState);
+            break;
     }
-    if (id === 1) this.contents.fontBold = !this.contents.fontBold;
-    if (id === 2) this.contents.fontItalic = !this.contents.fontItalic;
-    break;
-  case 'FS':
-    var size = this.obtainEscapeParam(textState);
-    this.contents.fontSize = size;
-    if (Yanfly.Param.MSGFontMaintain) $gameSystem.setMessageFontSize(size);
-    break;
-  case 'FN':
-    var name = this.obtainEscapeString(textState);
-    this.contents.fontFace = name;
-    if (Yanfly.Param.MSGFontMaintain) $gameSystem.setMessageFontName(name);
-    break;
-  case 'OC':
-    var id = this.obtainEscapeParam(textState);
-    this.contents.outlineColor = this.textColor(id);
-    break;
-  case 'OW':
-    this.contents.outlineWidth = this.obtainEscapeParam(textState);
-    break;
-  case 'PX':
-    textState.x = this.obtainEscapeParam(textState);
-    break;
-  case 'PY':
-    textState.y = this.obtainEscapeParam(textState);
-    break;
-  default:
-    Yanfly.Message.Window_Base_processEscapeCharacter.call(this,
-     code, textState);
-    break;
-  }
 };
 
 Window_Base.prototype.makeFontBigger = function() {
@@ -884,8 +878,8 @@ Window_Base.prototype.makeFontBigger = function() {
 };
 
 Window_Base.prototype.makeFontSmaller = function() {
-  var size = this.contents.fontSize - eval(Yanfly.Param.MSGFontSizeChange);
-  this.contents.fontSize = Math.max(size, Yanfly.Param.MSGFontChangeMin);
+    var size = this.contents.fontSize - eval(Yanfly.Param.MSGFontSizeChange);
+    this.contents.fontSize = Math.max(size, Yanfly.Param.MSGFontChangeMin);
 };
 
 Yanfly.Message.Window_Base_processNormalCharacter =
@@ -899,21 +893,21 @@ Window_Base.prototype.checkWordWrap = function(textState) {
     if (!textState) return false;
     if (!this._wordWrap) return false;
     if (textState.text[textState.index] === ' ') {
-      var nextSpace = textState.text.indexOf(' ', textState.index + 1);
-      var nextBreak = textState.text.indexOf('\n', textState.index + 1);
-      if (nextSpace < 0) nextSpace = textState.text.length + 1;
-      if (nextBreak > 0) nextSpace = Math.min(nextSpace, nextBreak);
-      var word = textState.text.substring(textState.index, nextSpace);
-      var size = this.textWidthExCheck(word);
+        var nextSpace = textState.text.indexOf(' ', textState.index + 1);
+        var nextBreak = textState.text.indexOf('\n', textState.index + 1);
+        if (nextSpace < 0) nextSpace = textState.text.length + 1;
+        if (nextBreak > 0) nextSpace = Math.min(nextSpace, nextBreak);
+        var word = textState.text.substring(textState.index, nextSpace);
+        var size = this.textWidthExCheck(word);
     }
     return (size + textState.x > this.wordwrapWidth());
 };
 
-Window_Base.prototype.wordwrapWidth = function(){
-  return this.contents.width;
+Window_Base.prototype.wordwrapWidth = function() {
+    return this.contents.width;
 };
 
-Window_Base.prototype.saveCurrentWindowSettings = function(){
+Window_Base.prototype.saveCurrentWindowSettings = function() {
     this._saveFontFace = this.contents.fontFace;
     this._saveFontSize = this.contents.fontSize;
     this._savetextColor = this.contents.textColor;
@@ -923,7 +917,7 @@ Window_Base.prototype.saveCurrentWindowSettings = function(){
     this._saveOutlineWidth = this.contents.outlineWidth;
 };
 
-Window_Base.prototype.restoreCurrentWindowSettings = function(){
+Window_Base.prototype.restoreCurrentWindowSettings = function() {
     this.contents.fontFace = this._saveFontFace;
     this.contents.fontSize = this._saveFontSize;
     this.contents.textColor = this._savetextColor;
@@ -933,7 +927,7 @@ Window_Base.prototype.restoreCurrentWindowSettings = function(){
     this.contents.outlineWidth = this._saveOutlineWidth;
 };
 
-Window_Base.prototype.clearCurrentWindowSettings = function(){
+Window_Base.prototype.clearCurrentWindowSettings = function() {
     this._saveFontFace = undefined;
     this._saveFontSize = undefined;
     this._savetextColor = undefined;
@@ -963,9 +957,9 @@ Window_Base.prototype.textWidthExCheck = function(text) {
 Yanfly.Message.Window_Help_setItem = Window_Help.prototype.setItem;
 Window_Help.prototype.setItem = function(item) {
     if (eval(Yanfly.Param.MSGDescWrap)) {
-      this.setText(item ? '<WordWrap>' + item.description : '');
+        this.setText(item ? '<WordWrap>' + item.description : '');
     } else {
-      Yanfly.Message.Window_Help_setItem.call(this, item);
+        Yanfly.Message.Window_Help_setItem.call(this, item);
     }
 };
 
@@ -987,9 +981,9 @@ Window_ChoiceList.prototype.updatePlacement = function() {
     Yanfly.Message.Window_ChoiceList_updatePlacement.call(this);
     var messagePosType = $gameMessage.positionType();
     if (messagePosType === 0) {
-      this.y = this._messageWindow.height;
+        this.y = this._messageWindow.height;
     } else if (messagePosType === 2) {
-      this.y = Graphics.boxHeight - this._messageWindow.height - this.height;
+        this.y = Graphics.boxHeight - this._messageWindow.height - this.height;
     }
 };
 
@@ -1004,15 +998,15 @@ Window_NumberInput.prototype.updatePlacement = function() {
     var messageY = this._messageWindow.y;
     var messagePosType = $gameMessage.positionType();
     if (messagePosType === 0) {
-      this.y = this._messageWindow.height;
+        this.y = this._messageWindow.height;
     } else if (messagePosType === 1) {
-      if (messageY >= Graphics.boxHeight / 2) {
-          this.y = messageY - this.height;
-      } else {
-          this.y = messageY + this._messageWindow.height;
-      }
+        if (messageY >= Graphics.boxHeight / 2) {
+            this.y = messageY - this.height;
+        } else {
+            this.y = messageY + this._messageWindow.height;
+        }
     } else if (messagePosType === 2) {
-      this.y = Graphics.boxHeight - this._messageWindow.height - this.height;
+        this.y = Graphics.boxHeight - this._messageWindow.height - this.height;
     }
 };
 
@@ -1026,9 +1020,9 @@ Window_EventItem.prototype.updatePlacement = function() {
     Yanfly.Message.Window_EventItem_updatePlacement.call(this);
     var messagePosType = $gameMessage.positionType();
     if (messagePosType === 0) {
-      this.y = Graphics.boxHeight - this.height;
+        this.y = Graphics.boxHeight - this.height;
     } else if (messagePosType === 2) {
-      this.y = 0;
+        this.y = 0;
     }
 };
 
@@ -1066,8 +1060,8 @@ Window_NameBox.prototype.initialize = function(parentWindow) {
     this._closeCounter = 0;
     this.deactivate();
     if (eval(Yanfly.Param.MSGNameBoxClear)) {
-      this.backOpacity = 0;
-      this.opacity = 0;
+        this.backOpacity = 0;
+        this.opacity = 0;
     }
     this.hide();
 };
@@ -1107,7 +1101,7 @@ Window_NameBox.prototype.update = function() {
     if (this.isClosing()) return;
     if (this._closeCounter-- > 0) return;
     if (this._parentWindow.isClosing()) {
-      this._openness = this._parentWindow.openness;
+        this._openness = this._parentWindow.openness;
     }
     this.close();
 };
@@ -1136,40 +1130,40 @@ Window_NameBox.prototype.refresh = function(text, position) {
 
 Window_NameBox.prototype.adjustPositionX = function() {
     if (this._position === 1) {
-      this.x = this._parentWindow.x;
-      this.x += eval(Yanfly.Param.MSGNameBoxBufferX);
+        this.x = this._parentWindow.x;
+        this.x += eval(Yanfly.Param.MSGNameBoxBufferX);
     } else if (this._position === 2) {
-      this.x = this._parentWindow.x;
-      this.x += this._parentWindow.width * 3 / 10;
-      this.x -= this.width / 2;
+        this.x = this._parentWindow.x;
+        this.x += this._parentWindow.width * 3 / 10;
+        this.x -= this.width / 2;
     } else if (this._position === 3) {
-      this.x = this._parentWindow.x;
-      this.x += this._parentWindow.width / 2;
-      this.x -= this.width / 2;
+        this.x = this._parentWindow.x;
+        this.x += this._parentWindow.width / 2;
+        this.x -= this.width / 2;
     } else if (this._position === 4) {
-      this.x = this._parentWindow.x;
-      this.x += this._parentWindow.width * 7 / 10;
-      this.x -= this.width / 2;
+        this.x = this._parentWindow.x;
+        this.x += this._parentWindow.width * 7 / 10;
+        this.x -= this.width / 2;
     } else {
-      this.x = this._parentWindow.x + this._parentWindow.width;
-      this.x -= this.width;
-      this.x -= eval(Yanfly.Param.MSGNameBoxBufferX);
+        this.x = this._parentWindow.x + this._parentWindow.width;
+        this.x -= this.width;
+        this.x -= eval(Yanfly.Param.MSGNameBoxBufferX);
     }
     this.x = this.x.clamp(0, Graphics.boxWidth - this.width);
 };
 
 Window_NameBox.prototype.adjustPositionY = function() {
     if ($gameMessage.positionType() === 0) {
-      this.y = this._parentWindow.y + this._parentWindow.height;
-      this.y -= eval(Yanfly.Param.MSGNameBoxBufferY);
+        this.y = this._parentWindow.y + this._parentWindow.height;
+        this.y -= eval(Yanfly.Param.MSGNameBoxBufferY);
     } else {
-      this.y = this._parentWindow.y;
-      this.y -= this.height;
-      this.y += eval(Yanfly.Param.MSGNameBoxBufferY);
+        this.y = this._parentWindow.y;
+        this.y -= this.height;
+        this.y += eval(Yanfly.Param.MSGNameBoxBufferY);
     }
     if (this.y < 0) {
-      this.y = this._parentWindow.y + this._parentWindow.height;
-      this.y -= eval(Yanfly.Param.MSGNameBoxBufferY);
+        this.y = this._parentWindow.y + this._parentWindow.height;
+        this.y -= eval(Yanfly.Param.MSGNameBoxBufferY);
     }
 };
 
@@ -1195,18 +1189,18 @@ Window_Message.prototype.windowWidth = function() {
     return $gameSystem.messageWidth();
 };
 
-Window_Message.prototype.wordwrapWidth = function(){
-  if (Yanfly.Param.MSGTightWrap && $gameMessage.faceName() !== '') {
-    return this.contents.width - this.newLineX();
-  }
-  return Window_Base.prototype.wordwrapWidth.call(this);
+Window_Message.prototype.wordwrapWidth = function() {
+    if (Yanfly.Param.MSGTightWrap && $gameMessage.faceName() !== '') {
+        return this.contents.width - this.newLineX();
+    }
+    return Window_Base.prototype.wordwrapWidth.call(this);
 };
 
 Window_Message.prototype.adjustWindowSettings = function() {
     this.width = this.windowWidth();
     this.height = Math.min(this.windowHeight(), Graphics.boxHeight);
     if (Math.abs(Graphics.boxHeight - this.height) < this.lineHeight()) {
-      this.height = Graphics.boxHeight;
+        this.height = Graphics.boxHeight;
     }
     this.createContents();
     this.x = (Graphics.boxWidth - this.width) / 2;
@@ -1243,9 +1237,9 @@ Window_Message.prototype.standardFontSize = function() {
 
 Window_Message.prototype.newLineX = function() {
     if ($gameMessage.faceName() === '') {
-      return 0;
+        return 0;
     } else {
-      return eval(Yanfly.Param.MSGFaceIndent);
+        return eval(Yanfly.Param.MSGFaceIndent);
     }
 };
 
@@ -1258,10 +1252,10 @@ Yanfly.Message.Window_Message_updateInput =
     Window_Message.prototype.updateInput;
 Window_Message.prototype.updateInput = function() {
     if (this.pause && this.isFastForward()) {
-      if (!this._textState) {
-        this.pause = false;
-        this.terminateMessage();
-      }
+        if (!this._textState) {
+            this.pause = false;
+            this.terminateMessage();
+        }
     }
     return Yanfly.Message.Window_Message_updateInput.call(this);
 };
@@ -1351,72 +1345,72 @@ Yanfly.Message.Window_Message_processEscapeCharacter =
     Window_Message.prototype.processEscapeCharacter;
 Window_Message.prototype.processEscapeCharacter = function(code, textState) {
     switch (code) {
-    case '!':
-      if (!this.isFastForward()) this.startPause();
-      break;
-    case 'W':
-      this.startWait(this.obtainEscapeParam(textState));
-    default:
-      Yanfly.Message.Window_Message_processEscapeCharacter.call(this,
-        code, textState);
-      break;
+        case '!':
+            if (!this.isFastForward()) this.startPause();
+            break;
+        case 'W':
+            this.startWait(this.obtainEscapeParam(textState));
+        default:
+            Yanfly.Message.Window_Message_processEscapeCharacter.call(this,
+                code, textState);
+            break;
     }
 };
 
 if (Yanfly.Param.MSGNameBoxClose) {
 
-Yanfly.Message.Window_Message_doesContinue =
-  Window_Message.prototype.doesContinue;
-Window_Message.prototype.doesContinue = function() {
-  var value = Yanfly.Message.Window_Message_doesContinue.call(this);
-  if (!value) return false;
-  if (this.hasDifferentNameBoxText()) {
-    return false;
-  }
-  return true;
-};
+    Yanfly.Message.Window_Message_doesContinue =
+        Window_Message.prototype.doesContinue;
+    Window_Message.prototype.doesContinue = function() {
+        var value = Yanfly.Message.Window_Message_doesContinue.call(this);
+        if (!value) return false;
+        if (this.hasDifferentNameBoxText()) {
+            return false;
+        }
+        return true;
+    };
 
-Window_Message.prototype.hasDifferentNameBoxText = function() {
-  var texts = $gameMessage._texts;
-  var length = texts.length;
-  var open = this._nameWindow.isOpen();
-  for (var i = 0; i < length; ++i) {
-    var text = texts[i];
-    if (text.length <= 0) continue;
-    if (Yanfly.MsgMacro) {
-      text = this.convertMacroText(text);
-      text = text.replace(/\x1b/gi, '\\');
-    }
-    if (text.match(/\\(?:N|N1|N2|N3|N4|N5|NC|NR)<(.*)>/i)) {
-      var name = String(RegExp.$1);
-    } else if (text.match(/\\(?:ND|ND1|ND2|ND3|ND4|ND5|NDC|NDR)<(.*)>/i)) {
-      var name = String(RegExp.$1);
-    } else if (text.match(/\\(?:NT|NT1|NT2|NT3|NT4|NT5|NTC|NTR)<(.*)>/i)) {
-      var name = String(RegExp.$1);
-    }
-    if (name) {
-      name = name.replace(/\\V\[(\d+)\]/gi, function() {
-        return $gameVariables.value(parseInt(arguments[1]));
-      }.bind(this));
-      name = name.replace(/\\V\[(\d+)\]/gi, function() {
-        return $gameVariables.value(parseInt(arguments[1]));
-      }.bind(this));
-      name = name.replace(/\\N\[(\d+)\]/gi, function() {
-        return this.actorName(parseInt(arguments[1]));
-      }.bind(this));
-      name = name.replace(/\\P\[(\d+)\]/gi, function() {
-        return this.partyMemberName(parseInt(arguments[1]));
-      }.bind(this));
-      name = name.replace(/\\/gi, '\x1b');
-    }
-    if (name && !open) return true;
-    if (name && name !== this._nameWindow._lastNameText) {
-      return true;
-    }
-  }
-  if (open && !name) return true;
-  return false;
-};
+    Window_Message.prototype.hasDifferentNameBoxText = function() {
+        var texts = $gameMessage._texts;
+        var length = texts.length;
+        var open = this._nameWindow.isOpen();
+        for (var i = 0; i < length; ++i) {
+            var text = texts[i];
+            if (text.length <= 0) continue;
+            if (Yanfly.MsgMacro) {
+                text = this.convertMacroText(text);
+                text = text.replace(/\x1b/gi, '\\');
+            }
+            if (text.match(/\\(?:N|N1|N2|N3|N4|N5|NC|NR)<(.*)>/i)) {
+                var name = String(RegExp.$1);
+            } else if (text.match(/\\(?:ND|ND1|ND2|ND3|ND4|ND5|NDC|NDR)<(.*)>/i)) {
+                var name = String(RegExp.$1);
+            } else if (text.match(/\\(?:NT|NT1|NT2|NT3|NT4|NT5|NTC|NTR)<(.*)>/i)) {
+                var name = String(RegExp.$1);
+            }
+            if (name) {
+                name = name.replace(/\\V\[(\d+)\]/gi, function() {
+                    return $gameVariables.value(parseInt(arguments[1]));
+                }.bind(this));
+                name = name.replace(/\\V\[(\d+)\]/gi, function() {
+                    return $gameVariables.value(parseInt(arguments[1]));
+                }.bind(this));
+                name = name.replace(/\\N\[(\d+)\]/gi, function() {
+                    return this.actorName(parseInt(arguments[1]));
+                }.bind(this));
+                name = name.replace(/\\P\[(\d+)\]/gi, function() {
+                    return this.partyMemberName(parseInt(arguments[1]));
+                }.bind(this));
+                name = name.replace(/\\/gi, '\x1b');
+            }
+            if (name && !open) return true;
+            if (name && name !== this._nameWindow._lastNameText) {
+                return true;
+            }
+        }
+        if (open && !name) return true;
+        return false;
+    };
 
 } // Yanfly.Param.MSGNameBoxClose
 
